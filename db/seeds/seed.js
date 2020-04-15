@@ -8,19 +8,11 @@ const {
 const { formatDates, formatComments, makeRefObj } = require('../utils/utils');
 
 exports.seed = function(knex) {
-  // return knex.migrate.rollback().then(() => {
-  //   return knex.migrate.latest();
-  // })
-  // .then(() => {
-  //   return knex('topics').insert(topicData).returning('*');
-  // })
-  // .then(() => {
-  //   return knex('users').insert(userData).returning('*');
-  // })
-  // .then(() => {
-
-  // })
-  const topicsInsertions = knex('topics').insert(topicData);
+  return knex.migrate.rollback().then(() => {
+    return knex.migrate.latest();
+  })
+  .then(() => {
+    const topicsInsertions = knex('topics').insert(topicData);
   const usersInsertions = knex('users').insert(userData);
 
   return Promise.all([topicsInsertions, usersInsertions])
@@ -38,6 +30,7 @@ exports.seed = function(knex) {
       Your comment insertions will depend on information from the seeded articles, so make sure to return the data after it's been seeded.
       */
     })
+  })
     .then(articleRows => {
       /* 
 
