@@ -9,6 +9,14 @@ beforeEach(() => connection.seed.run());
 after(() => connection.destroy())
 
 describe('/api', () => {
+    it('returns status code 404 for an invalid path', () => {
+        return request(app)
+        .get("/invalid-path")
+        .expect(404)
+        .then(({ body: {msg}}) => {
+            expect(msg).to.equal('Path Not Found');
+        });
+    });
     describe('/topics', () => {
         it('GET 200: - responds with an array of topic objects', () => {
             return request(app).get('/api/topics').expect(200).then((res) => {
