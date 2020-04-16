@@ -15,5 +15,11 @@ exports.updateComment = (comment_id, inc_votes) => {
 exports.deleteComment = (comment_id) => {
     return connection('comments')
         .del()
-        .where({comment_id});
+        .where({comment_id})
+        .returning('*')
+        .then(comment => {
+            if(comment.length === 0)
+                return Promise.reject({ status: 404, msg: 'Comment Not Found'});
+            return comment;
+        });;
 }

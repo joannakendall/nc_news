@@ -75,6 +75,23 @@ describe('/api', () => {
                     expect(article.comment_count).to.equal('13')
                 })
         })
+        it('GET 404 Path Not Found for invalid id', () => {
+            return request(app)
+                .get('/api/articles/10000')
+                .expect(404)
+                .then(({ body: { msg }}) => {
+                   expect(msg).to.equal('Article Not Found');
+                });
+        })
+        it('GET 400 Invalid Path for id not a number', () => {
+            return request(app)
+            .get('/api/articles/invalid')
+            .send({ inc_votes : 1 })
+            .expect(400)
+            .then(({ body }) => {
+               expect(body.msg).to.equal('Bad Request');
+            });
+        })
         it('PATCH 200 - returns article with updated vote', () => {
             return request(app)
                 .patch('/api/articles/1')
@@ -84,15 +101,16 @@ describe('/api', () => {
                     expect(body.article.votes).to.equal(101);
                 })
         })
-        it('404 Path Not Found for invalid id', () => {
+        it('PATCH 400 Invalid Path for id not a number', () => {
             return request(app)
-                .get('/api/articles/10000')
-                .expect(404)
-                .then(({ body: { msg }}) => {
-                   expect(msg).to.equal('Article Not Found');
-                });
+            .patch('/api/articles/invalid')
+            .send({ inc_votes : 1 })
+            .expect(400)
+            .then(({ body }) => {
+               expect(body.msg).to.equal('Bad Request');
+            });
         })
-        it('400 Invalid Path for id not a number', () => {
+        it('GET 400 Invalid Path for id not a number', () => {
             return request(app)
             .patch('/api/articles/invalid')
             .send({ inc_votes : 1 })
@@ -112,7 +130,7 @@ describe('/api', () => {
                     expect(body.comment.votes).to.equal(17);
                 })
         })
-        it('PATCH 404 Path Not Found for invalid id', () => {
+        it('PATCH 404 for invalid comment id', () => {
             return request(app)
                 .patch('/api/comments/10000')
                 .send({ inc_votes : 1 })
@@ -141,6 +159,23 @@ describe('/api', () => {
                     expect(comment.length).to.equal(0);
                 });
         })
-
+        it('DELETE 404 invalid comment id', () => {
+            return request(app)
+                .del('/api/comments/10000')
+                .send({ inc_votes : 1 })
+                .expect(404)
+                .then(({ body }) => {
+                   expect(body.msg).to.equal('Comment Not Found');
+                });
+        })
+        it('DELETE 400 Bad Request comment_id not a number', () => {
+            return request(app)
+            .del('/api/comments/invalid')
+            .send({ inc_votes : 1 })
+            .expect(400)
+            .then(({ body }) => {
+               expect(body.msg).to.equal('Bad Request');
+            });
+        })
     })
 })
