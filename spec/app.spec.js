@@ -121,29 +121,32 @@ describe('/api', () => {
             });
         })
     })
-    // describe('/articles/:article_id/comments', () => {
-    //     it('POST 201 posts a new comment to the requested article', () => {
-    //         return request(app)
-    //             .post('/articles/1/comments')
-    //             .send({})
-    //             .expect(201)
-    //             .then((res) => {
-    //                 console.log(res)
-    //                 expect(res.body.comment).to.have.all.keys(['username', 'body'])
-    //             })
-    //     })
-    // })
+    describe('/articles/:article_id/comments', () => {
+        it('POST 201 posts a new comment to the requested article', () => {
+            return request(app)
+                .post('/api/articles/1/comments')
+                .send({
+                        username: "butter_bridge",
+                        body: "new comment"
+                    })
+                .expect(201)
+                .then((res) => {
+                    expect(res.body.comment).to.have.all.keys(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body'])
+                })
+        })
+    })
     describe('/articles', () => {
         it('GET 200 sends all articles', () => {
             return request(app)
             .get('/api/articles')
             .expect(200)
             .then(({body: {articles}}) => {
+                expect(articles.length).to.equal(12)
                  articles.forEach((article) => {
                      expect(article).to.have.all.keys(['title',
                     'article_id',
                     'topic',
-                    'created_at',
+                    'created_at', 
                     'votes',
                     'comment_count',
                     'author', 
@@ -151,13 +154,66 @@ describe('/api', () => {
                  })   
              })
         })
-        it('GET 200 default sort_by article_id', () => {
+        it('GET 200 each article should have a comment_count property', () => {
             return request(app)
                 .get('/api/articles')
                 .expect(200)
-                .then(({ body: { articles }}) => {
-                    expect(articles).to.be.ascendingBy('articles_id')
+                .then(({ body: {articles}}) => {
+                    expect(articles[0].comment_count).to.equal('13')
                 })
+        })
+        describe('queries for GET 200', () => {
+            it('default sort_by date, order default to desc', () => {
+                return request(app)
+                    .get('/api/articles')
+                    .expect(200)
+                    .then(({ body: { articles }}) => {
+                        expect(articles).to.be.descendingBy('created_at')
+                    })
+            })
+            it('accepts a sort_by query that is not the default and responds with the articles sorted by article_id', () => {
+                return request(app)
+                    .get('/api/articles?sort_by=article_id')
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body.articles).to.be.sortedBy('article_id', {descending: true})
+                    })
+            })
+            it('accepts an order query and responds with the articles in the given order', () => {
+                return request(app)
+                    .get('/api/articles?order=asc')
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body.articles).to.be.ascendingBy('created_at');
+                    })
+            })
+            it('accepts an author query and responds with the requested articles', () => {
+                return request(app)
+                    .get('/api/articles?author=butter_bridge')
+                    .expect(200) 
+                    .then(res => {
+                        expect(res.body.articles.length).to.equal(3)
+                    })
+            })
+            it('accepts a topics query and response with the requested articles', () => {
+                return request(app)
+                    .get('/api/articles?topic=mitch')
+                    .expect(200) 
+                    .then(res => {
+                        expect(res.body.articles.length).to.equal(11)
+                })
+            })
+        })
+        describe('query errors', () =>{
+            it('404 Column not Found for invalid sort_by query', () => {
+                return request(app)
+                    .get('/api/articles?sort_by=invalid')
+                    .expect(404)
+                    .then(({ body: { msg }}) => {
+                        expect(msg).to.equal('Column not Found');
+                 })  
+            })
+            it('')
         })
     })
     describe('/comments/:comment_id', () => {

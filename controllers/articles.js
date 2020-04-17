@@ -18,18 +18,17 @@ exports.patchArticle = (req, res, next) => {
     .catch(next)
 }
 
-// exports.postComment = (req, res, next) => {
-//     console.log('in controller')
-    // insertComment(req.body).then ((comment) => {
-    //     console.log(req.body)
-    //     res.status(201).send({ comment })
-    // })
-    // .catch(next)
-//}
+exports.postComment = (req, res, next) => {
+    const { article_id } = req.params
+    const comment = req.body
+    insertComment(article_id, comment).then ((comment) => {
+        res.status(201).send({ comment })
+    })
+    .catch(next)
+}
 
 exports.sendAllArticles = (req, res, next) => {
-    //console.log(articles)
-    getAllArticles().then((articles) => {
+    getAllArticles(req.query).then((articles) => {
         res.status(200).send({articles})
     })
     .catch(next)

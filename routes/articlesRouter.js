@@ -9,8 +9,6 @@ articlesRouter.route('/')
     .get(sendAllArticles)
 
 
-// articlesRouter.post('/:article_id/comments', (req, res) => {
-//     console.log('in router')
-// })
+articlesRouter.post('/:article_id/comments', postComment)
 
 module.exports = articlesRouter;
