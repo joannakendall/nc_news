@@ -27,9 +27,19 @@ exports.updateArticle = (article_id, inc_votes) => {
         });
 } 
 
-// SELECT articles.*, COUNT(articles.article_id) AS comment_count  FROM articles
-// LEFT JOIN comments ON
-// articles.article_id = comments.article_id
-// WHERE articles.article_id = 1
-// GROUP BY articles.article_id
-// ;
+// exports.insertComment = (newComment) => {
+//     return connection.insert(newComment).into('comments').returning('username', 'body').then((comment) => {
+//         console.log(comment)
+//         return comment[0];
+//     })
+// }
+
+exports.getAllArticles = () => {
+    console.log(articles)
+    return connection('articles')
+        .select('*')
+        .orderBy('article_id')
+        .then((articles) => {
+            return articles
+        })
+}

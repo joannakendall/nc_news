@@ -3,6 +3,7 @@ const app = require('../app');
 const request = require('supertest');
 const chai = require('chai');
 const {expect} = chai
+chai.use(require('chai-sorted'))
 const connection = require('../db/connection')
 
 beforeEach(() => connection.seed.run());
@@ -118,6 +119,45 @@ describe('/api', () => {
             .then(({ body }) => {
                expect(body.msg).to.equal('Bad Request');
             });
+        })
+    })
+    // describe('/articles/:article_id/comments', () => {
+    //     it('POST 201 posts a new comment to the requested article', () => {
+    //         return request(app)
+    //             .post('/articles/1/comments')
+    //             .send({})
+    //             .expect(201)
+    //             .then((res) => {
+    //                 console.log(res)
+    //                 expect(res.body.comment).to.have.all.keys(['username', 'body'])
+    //             })
+    //     })
+    // })
+    describe('/articles', () => {
+        it('GET 200 sends all articles', () => {
+            return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({body: {articles}}) => {
+                 articles.forEach((article) => {
+                     expect(article).to.have.all.keys(['title',
+                    'article_id',
+                    'topic',
+                    'created_at',
+                    'votes',
+                    'comment_count',
+                    'author', 
+                    'body'])
+                 })   
+             })
+        })
+        it('GET 200 default sort_by article_id', () => {
+            return request(app)
+                .get('/api/articles')
+                .expect(200)
+                .then(({ body: { articles }}) => {
+                    expect(articles).to.be.ascendingBy('articles_id')
+                })
         })
     })
     describe('/comments/:comment_id', () => {

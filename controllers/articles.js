@@ -1,4 +1,4 @@
-const { getArticle, updateArticle } = require('../models/articles.js')
+const { getArticle, updateArticle, insertComment, getAllArticles } = require('../models/articles.js')
 
 exports.sendArticle = (req, res, next) => {
     const {article_id} = req.params;
@@ -14,6 +14,23 @@ exports.patchArticle = (req, res, next) => {
     updateArticle(article_id, inc_votes)
     .then( article => {
         res.status(200).send({ article })
+    })
+    .catch(next)
+}
+
+// exports.postComment = (req, res, next) => {
+//     console.log('in controller')
+    // insertComment(req.body).then ((comment) => {
+    //     console.log(req.body)
+    //     res.status(201).send({ comment })
+    // })
+    // .catch(next)
+//}
+
+exports.sendAllArticles = (req, res, next) => {
+    //console.log(articles)
+    getAllArticles().then((articles) => {
+        res.status(200).send({articles})
     })
     .catch(next)
 }
