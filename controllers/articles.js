@@ -1,4 +1,4 @@
-const { getArticle, updateArticle, insertComment, getAllArticles } = require('../models/articles.js')
+const { getArticle, updateArticle, insertComment, getAllArticles, getComments } = require('../models/articles.js')
 
 exports.sendArticle = (req, res, next) => {
     const {article_id} = req.params;
@@ -21,7 +21,7 @@ exports.patchArticle = (req, res, next) => {
 exports.postComment = (req, res, next) => {
     const { article_id } = req.params
     const comment = req.body
-    insertComment(article_id, comment).then ((comment) => {
+    insertComment(article_id, comment).then((comment) => {
         res.status(201).send({ comment })
     })
     .catch(next)
@@ -32,4 +32,11 @@ exports.sendAllArticles = (req, res, next) => {
         res.status(200).send({articles})
     })
     .catch(next)
+}
+
+exports.sendComments = (req, res, next) => {
+    const { article_id } = req.params;
+    getComments({article_id}, req.query).then((comments) => {
+        res.status(200).send({comments})
+    })
 }

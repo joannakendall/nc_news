@@ -121,7 +121,7 @@ describe('/api', () => {
             });
         })
     })
-    describe('/articles/:article_id/comments', () => {
+    describe.only('/articles/:article_id/comments', () => {
         it('POST 201 posts a new comment to the requested article', () => {
             return request(app)
                 .post('/api/articles/1/comments')
@@ -133,6 +133,35 @@ describe('/api', () => {
                 .then((res) => {
                     expect(res.body.comment).to.have.all.keys(['comment_id', 'author', 'article_id', 'votes', 'created_at', 'body'])
                 })
+        })
+        it('GET 200 returns all comments for the requested article', () => {
+            return request(app)
+                .get('/api/articles/1/comments')
+                .expect(200)
+                .then((res) => {
+                    res.body.comments.forEach(comment => {
+                        expect(comment).to.have.all.keys(['comment_id', 'author', 'votes', 'created_at', 'body'])
+                    })
+                    expect(res.body.comments.length).to.equal(13)
+                })
+        })
+        describe('200 GET queries', () => {
+            it('sort_by query default to created_at and order default to desc', () => {
+                return request(app)
+                    .get('/api/articles/1/comments')
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body.comments).to.be.descendingBy('created_at')
+                    })
+            })
+            it('accepts a sort_by and order query that is not the default', () => {
+                return request(app)
+                    .get('/api/articles/1/comments?sort_by=comment_id&order=asc')
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body.comments).to.be.ascendingBy('comment_id')
+                    })
+            })
         })
     })
     describe('/articles', () => {
@@ -213,7 +242,6 @@ describe('/api', () => {
                         expect(msg).to.equal('Column not Found');
                  })  
             })
-            it('')
         })
     })
     describe('/comments/:comment_id', () => {

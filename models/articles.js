@@ -62,3 +62,16 @@ exports.getAllArticles = ({
       return articles;
     });
 };
+
+exports.getComments = ({article_id, sort_by = "created_at",
+order = "desc"}) => {
+    return connection('comments')
+        .select('comment_id', 'votes', 'created_at', 'author', 'body')
+        .orderBy(sort_by, order)
+        .modify((articleQuery) => {
+            if (article_id) articleQuery.where({ article_id });
+          })
+        .then(comments => {
+            return comments
+        })
+}
