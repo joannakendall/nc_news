@@ -4,7 +4,7 @@ exports.handle405s = (req, res) => {
 
 exports.handlePSQLErrors = (err, req, res, next) => {
     if(err.code) {
-        const badRequestsCodes = ['22P02'];
+        const badRequestsCodes = ['22P02', '42703'];
         if(badRequestsCodes.includes(err.code)){
             res.status(400).send({msg: 'Bad Request'});
         }

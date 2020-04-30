@@ -214,7 +214,7 @@ describe('/api', () => {
             return Promise.all(requests);
         })
     })
-    describe.only('/articles', () => {
+    describe('/articles', () => {
         it('GET 200 sends all articles', () => {
             return request(app)
             .get('/api/articles')
@@ -285,22 +285,31 @@ describe('/api', () => {
             })
         })
         describe('query errors', () =>{
-            it('404 Order not Found for invalid order query', () => {
+            it('404 Invalid query when author not found', () => {
                 return request(app)
-                    .get('/api/articles?order=invalid')
+                    .get('/api/articles?author=invalid')
                     .expect(404)
                     .then(({ body: { msg }}) => {
-                        expect(msg).to.equal('Order not Found');
+                        expect(msg).to.equal('Not Found');
                  })  
             })
-            it.only('404 Column not Found if invalid sort_by query', () => {
+            it('400 Bad Request if invalid sort_by query', () => {
                 return request(app)
                     .get('/api/articles?sort_by=invalid')
-                    .expect(404)
+                    .expect(400)
                     .then(({ body: { msg }}) => {
-                        expect(msg).to.equal('Column not Found');
+                        expect(msg).to.equal('Bad Request');
                  })
             })
+            it('404 Not Found if invalid topic', () => {
+                return request(app)
+                    .get('/api/articles?topic=invalid')
+                    .expect(404)
+                    .then(({body: {msg}}) => {
+                        expect(msg).to.equal('Not Found')
+                    })
+            })
+        
         })
         it('INVALID METHODS 405 - responds with Method Not Allowed', () => {
             const invalidMethods = ['delete','patch', 'put', 'post'];
