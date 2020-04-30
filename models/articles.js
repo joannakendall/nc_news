@@ -51,14 +51,16 @@ exports.getAllArticles = ({
     .orderBy(sort_by, order)
     .leftJoin("comments", "articles.article_id", "=", "comments.article_id")
     .groupBy("articles.article_id")
-    .count("articles.article_id as comment_count")
-    // .modify((queryBuilder) => {
-    //     if (author) queryBuilder.where({author})
-    //     if (topic) queryBuilder.where({topic});
-    //   })
+    .count("comments.article_id as comment_count")
+    .modify((queryBuilder) => {
+        if (author) queryBuilder.where({'articles.author': author}) 
+        if (topic) queryBuilder.where({topic});
+      })
     .then((articles) => {
-        if (articles.length === 0) 
-        return Promise.reject({ status: 400, msg: "Column Not Found" })
+      console.log(articles.length)
+          if (order !== 'asc' || 'desc') 
+          return Promise.reject({ status: 404, msg: "Order not Found" })
+         if(articles.length === 0) return Promise.reject({status: 404, msg: 'Column not Found'})
       return articles;
     });
 };

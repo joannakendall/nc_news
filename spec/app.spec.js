@@ -20,12 +20,26 @@ describe('/api', () => {
     });
     describe('/topics', () => {
         it('GET 200: - responds with an array of topic objects', () => {
-            return request(app).get('/api/topics').expect(200).then((res) => {
+            return request(app)
+                .get('/api/topics').
+                expect(200).then((res) => {
                 res.body.topics.forEach(topic => {
                     expect(topic).to.have.all.keys(['slug', 'description'])
                     expect(topic).to.be.an('object');
                 })
             }) 
+        })
+        it('INVALID METHODS 405 - responds with Method Not Allowed', () => {
+            const invalidMethods = ['delete', 'post', 'put', 'patch'];
+            const requests = invalidMethods.map((method) => {
+                return request(app)
+                    [method]('/api/topics')
+                    .expect(405)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Method Not Allowed');
+                    })
+            })
+            return Promise.all(requests);
         })
     })
     describe('/users/:username', () => {
@@ -49,6 +63,18 @@ describe('/api', () => {
                    expect(msg).to.equal('User Not Found');
                 });
         });
+        it('INVALID METHODS 405 - responds with Method Not Allowed', () => {
+            const invalidMethods = ['delete','post' , 'put', 'patch'];
+            const requests = invalidMethods.map((method) => {
+                return request(app)
+                    [method]('/api/users/butter_bridge')
+                    .expect(405)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Method Not Allowed');
+                    })
+            })
+            return Promise.all(requests);
+        })
     })
     describe('/articles/:article_id', () => {
         it('GET 200 - responds with the requested article from the query', () => {
@@ -120,8 +146,20 @@ describe('/api', () => {
                expect(body.msg).to.equal('Bad Request');
             });
         })
+        it('INVALID METHODS 405 - responds with Method Not Allowed', () => {
+            const invalidMethods = ['delete','post' , 'put'];
+            const requests = invalidMethods.map((method) => {
+                return request(app)
+                    [method]('/api/articles/2')
+                    .expect(405)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Method Not Allowed');
+                    })
+            })
+            return Promise.all(requests);
+        })
     })
-    describe.only('/articles/:article_id/comments', () => {
+    describe('/articles/:article_id/comments', () => {
         it('POST 201 posts a new comment to the requested article', () => {
             return request(app)
                 .post('/api/articles/1/comments')
@@ -163,8 +201,20 @@ describe('/api', () => {
                     })
             })
         })
+        it('INVALID METHODS 405 - responds with Method Not Allowed', () => {
+            const invalidMethods = ['delete','patch', 'put'];
+            const requests = invalidMethods.map((method) => {
+                return request(app)
+                    [method]('/api/articles/2/comments')
+                    .expect(405)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Method Not Allowed');
+                    })
+            })
+            return Promise.all(requests);
+        })
     })
-    describe('/articles', () => {
+    describe.only('/articles', () => {
         it('GET 200 sends all articles', () => {
             return request(app)
             .get('/api/articles')
@@ -216,7 +266,8 @@ describe('/api', () => {
                         expect(res.body.articles).to.be.ascendingBy('created_at');
                     })
             })
-            it('accepts an author query and responds with the requested articles', () => {
+            it
+            ('accepts an author query and responds with the requested articles', () => {
                 return request(app)
                     .get('/api/articles?author=butter_bridge')
                     .expect(200) 
@@ -234,14 +285,34 @@ describe('/api', () => {
             })
         })
         describe('query errors', () =>{
-            it('404 Column not Found for invalid sort_by query', () => {
+            it('404 Order not Found for invalid order query', () => {
+                return request(app)
+                    .get('/api/articles?order=invalid')
+                    .expect(404)
+                    .then(({ body: { msg }}) => {
+                        expect(msg).to.equal('Order not Found');
+                 })  
+            })
+            it.only('404 Column not Found if invalid sort_by query', () => {
                 return request(app)
                     .get('/api/articles?sort_by=invalid')
                     .expect(404)
                     .then(({ body: { msg }}) => {
                         expect(msg).to.equal('Column not Found');
-                 })  
+                 })
             })
+        })
+        it('INVALID METHODS 405 - responds with Method Not Allowed', () => {
+            const invalidMethods = ['delete','patch', 'put', 'post'];
+            const requests = invalidMethods.map((method) => {
+                return request(app)
+                    [method]('/api/articles')
+                    .expect(405)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Method Not Allowed');
+                    })
+            })
+            return Promise.all(requests);
         })
     })
     describe('/comments/:comment_id', () => {
@@ -300,6 +371,18 @@ describe('/api', () => {
             .then(({ body }) => {
                expect(body.msg).to.equal('Bad Request');
             });
+        })
+        it('INVALID METHODS 405 - responds with Method Not Allowed', () => {
+            const invalidMethods = ['get', 'put', 'post'];
+            const requests = invalidMethods.map((method) => {
+                return request(app)
+                    [method]('/api/comments/2')
+                    .expect(405)
+                    .then((res) => {
+                        expect(res.body.msg).to.equal('Method Not Allowed');
+                    })
+            })
+            return Promise.all(requests);
         })
     })
 })

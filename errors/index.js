@@ -1,3 +1,7 @@
+exports.handle405s = (req, res) => {
+    res.status(405).send({ msg : 'Method Not Allowed'});
+};
+
 exports.handlePSQLErrors = (err, req, res, next) => {
     if(err.code) {
         const badRequestsCodes = ['22P02'];
