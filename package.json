@@ -10,7 +10,11 @@
     "test": "mocha spec/app.spec.js",
     "migrate-make": "knex migrate:make",
     "migrate-latest": "knex migrate:latest",
-    "migrate-rollback": "knex migrate:rollback"
+    "migrate-rollback": "knex migrate:rollback",
+    "seed:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex seed:run",
+    "migrate-latest:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex migrate:latest",
+    "migrate-rollback:prod": "NODE_ENV=production DB_URL=$(heroku config:get DATABASE_URL) knex migrate:rollback",
+    "start": "node listen.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +29,7 @@
   "homepage": "https://github.com/northcoders/be-nc-news#readme",
   "dependencies": {
     "chai": "^4.2.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "knex": "^0.20.14",
     "mocha": "^7.1.1",
