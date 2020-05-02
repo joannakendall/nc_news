@@ -1,4 +1,4 @@
-const { getArticle, updateArticle, insertComment, getAllArticles, getComments } = require('../models/articles.js')
+const { getArticle, updateArticle, insertComment, getAllArticles, getComments, checkAuthorExists, checkTopicExists } = require('../models/articles.js')
 
 exports.sendArticle = (req, res, next) => {
     const {article_id} = req.params;
@@ -28,7 +28,13 @@ exports.postComment = (req, res, next) => {
 }
 
 exports.sendAllArticles = (req, res, next) => {
-
+    const { topic, author } = req.query;
+    if(topic){
+        checkTopicExists(req.query).catch(next)
+    }
+    if(author){
+        checkAuthorExists(req.query).catch(next)
+    }
     getAllArticles(req.query).then((articles) => {
         res.status(200).send({articles})
     })

@@ -285,14 +285,6 @@ describe('/api', () => {
             })
         })
         describe('query errors', () =>{
-            it('404 Invalid query when author not found', () => {
-                return request(app)
-                    .get('/api/articles?author=invalid')
-                    .expect(404)
-                    .then(({ body: { msg }}) => {
-                        expect(msg).to.equal('Not Found');
-                 })  
-            })
             it('400 Bad Request if invalid sort_by query', () => {
                 return request(app)
                     .get('/api/articles?sort_by=invalid')
@@ -301,12 +293,20 @@ describe('/api', () => {
                         expect(msg).to.equal('Bad Request');
                  })
             })
-            it('404 Not Found if invalid topic', () => {
+            it('404 Not Found if invalid author', () => {
                 return request(app)
-                    .get('/api/articles?topic=invalid')
+                    .get('/api/articles?author=invalid')
                     .expect(404)
                     .then(({body: {msg}}) => {
-                        expect(msg).to.equal('Not Found')
+                        expect(msg).to.equal('Author Not Found')
+                    })
+            })
+            it('200 returns empty array when author exists but no articles', () => {
+                return request(app)
+                    .get('/api/articles?author=lurker')
+                    .expect(200)
+                    .then(({ body: {articles}}) => {
+                        expect(articles).to.eql([])
                     })
             })
         

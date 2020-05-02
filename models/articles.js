@@ -56,11 +56,32 @@ exports.getAllArticles = ({
         if (author) queryBuilder.where({'articles.author': author}) 
         if (topic) queryBuilder.where({topic});
       })
-    .then((articles) => {
-        if(articles.length === 0)
-          return Promise.reject({ status: 404, msg: "Not Found"})
-      return articles;
-    });
+};
+
+exports.checkAuthorExists = ({author}) => {
+  return connection('users')
+    .select('*')
+    .where('username', author)
+    .then((existingAuthor) => {
+      if(!existingAuthor.length){
+        return Promise.reject({status:404, msg: "Author Not Found"})
+      }
+      return existingAuthor[0];
+    })
+  
+};
+
+exports.checkTopicExists = ({topic}) => {
+  return connection('topics')
+    .select('*')
+    .where('slug', topic)
+    .then((existingTopic) => {
+      if(!existingTopic.length){
+        return Promise.reject({status:404, msg: "Topic Not Found"})
+      }
+      return existingTopic[0];
+    })
+  
 };
 
 exports.getComments = ({article_id, sort_by = "created_at",
