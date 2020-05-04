@@ -84,7 +84,7 @@ exports.checkTopicExists = ({topic}) => {
   
 };
 
-exports.getComments = ({article_id, sort_by = "created_at",
+exports.getComments = ({article_id}, {sort_by = "created_at",
 order = "desc"}) => {
     return connection('comments')
         .select('comment_id', 'votes', 'created_at', 'author', 'body')
@@ -92,7 +92,20 @@ order = "desc"}) => {
         .modify((articleQuery) => {
             if (article_id) articleQuery.where({ article_id });
           })
-        .then(comments => {
-            return comments
-        })
+        // .then(comments => {
+        //     return comments
+        // })
 }
+
+exports.checkArticleExists = ({article_id}) => {
+  return connection('articles')
+    .select('*')
+    .where('article_id', article_id)
+    .then((existingArticle) => {
+      if(!existingArticle.length){
+        return Promise.reject({status:404, msg: "Article Not Found"})
+      }
+      return existingArticle[0];
+    })
+  
+};
